@@ -7,6 +7,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC, LinearSVC
 from sklearn.neighbors import KNeighborsClassifier
 
+# Load data
 data_test = pd.read_csv("test(1).csv")
 data_train = pd.read_csv("train(1).csv")
 
@@ -15,6 +16,7 @@ data_train = data_train.drop(['PassengerId'], axis=1)
 deck = {"A": 1, "B": 2, "C": 3, "D": 4, "E": 5, "F": 6, "G": 7, "U": 8}
 data = [data_train, data_test]
 
+# clean string data
 for dataset in data:
     dataset['Cabin'] = dataset['Cabin'].fillna("U0")
     dataset['Deck'] = dataset['Cabin'].map(lambda x: re.compile("([a-zA-Z]+)").search(x).group())
@@ -47,6 +49,7 @@ for dataset in data:
 data_train = data_train.drop('Name', axis=1)
 data_test = data_test.drop('Name', axis=1)
 
+# map gender to numerical type
 genders = {"male": 0,"female": 1}
 data = [data_train, data_test]
 for dataset in data:
@@ -55,11 +58,13 @@ for dataset in data:
 data_train = data_train.drop("Ticket", axis=1)
 data_test = data_test.drop("Ticket", axis=1)
 
+# map port to numerical type
 ports = {"S":0, "C":1, "Q":2}
 data = [data_test, data_train]
 for dataset in data:
     dataset['Embarked'] = dataset['Embarked'].map(ports)
 
+# create bucket for age
 data = [data_train, data_test]
 for dataset in data:
     dataset['Age'] = dataset['Age'].astype(int)
@@ -74,6 +79,7 @@ for dataset in data:
 
 data = [data_train, data_test]
 
+# create bucket for Fare
 for dataset in data:
     dataset.loc[ dataset['Fare'] <= 7.91, 'Fare'] = 0
     dataset.loc[(dataset['Fare'] > 7.91) & (dataset['Fare'] <= 14.454), 'Fare'] = 1
@@ -87,27 +93,31 @@ x_train = data_train.drop("Survived", axis=1)
 y_train = data_train["Survived"]
 x_test = data_test.drop("PassengerId", axis=1).copy()
 
+# use various classification models
 
 logReg = LogisticRegression()
 logReg.fit(x_train, y_train)
 y_pred = logReg.predict(x_test)
 acc_log = round(logReg.score(x_train, y_train) * 100, 2)
+print(f'Accuracy with Logistic Regression is {acc_log}')
 
 
 DTC = DecisionTreeClassifier()
 DTC.fit(x_train, y_train)
 y_pred = DTC.predict(x_test)
 acc_log = round(DTC.score(x_train, y_train) * 100, 2)
+print(f'Accuracy with Decision Tree Classifier is {acc_log}')
 
 
 svc = LinearSVC(max_iter=5000)
 svc.fit(x_train, y_train)
 y_pred = svc.predict(x_test)
 acc_log = round(svc.score(x_train, y_train) * 100, 2)
+print(f'Accuracy with Linear Support Vector Classfier is {acc_log}')
 
 
 knn = KNeighborsClassifier()
 knn.fit(x_train, y_train)
 y_pred = knn.predict(x_test)
 acc_log = round(knn.score(x_train, y_train) * 100, 2)
-acc_log
+print(f'Accuracy with K Neighbors Classifier is {acc_log}')
